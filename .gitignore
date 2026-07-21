@@ -1,12 +1,15 @@
-# Build output
-dist/
-.output/
-
 # Dependencies
 node_modules/
 
-# Astro cache
+# Build output
+dist/
+.output/
+apps/*/.vitepress/dist/
+apps/*/.vitepress/cache/
+
+# Framework caches
 .astro/
+apps/*/.astro/
 
 # Environment variables
 .env
@@ -18,7 +21,15 @@ node_modules/
 Thumbs.db
 
 # Editor
+.vscode/
 .vscode/extensions.json
 
 # Logs
 *.log
+
+# Runtime
+*.pid
+
+
+# Assembled docs output
+apps/site/docs/

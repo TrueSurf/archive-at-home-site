@@ -1,13 +1,19 @@
 {
-  "name": "archive-at-home-site",
-  "type": "module",
+  "name": "archive-at-home",
+  "private": true,
   "version": "1.0.0",
+  "description": "Archive-at-Home site (static main site + VitePress docs)",
+  "workspaces": [
+    "apps/docs"
+  ],
   "scripts": {
-    "dev": "astro dev",
-    "build": "astro build",
-    "preview": "astro preview"
+    "dev": "node scripts/serve-site.mjs",
+    "docs:dev": "npm run dev -w @archive-at-home/docs",
+    "docs:build": "npm run build -w @archive-at-home/docs",
+    "docs:preview": "npm run preview -w @archive-at-home/docs",
+    "build": "npm run docs:build && node scripts/assemble.mjs"
   },
-  "dependencies": {
-    "astro": "^5.13.0"
+  "engines": {
+    "node": ">=20"
   }
 }

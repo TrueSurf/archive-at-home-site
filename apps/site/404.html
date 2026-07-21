@@ -1,0 +1,79 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <script>
+    (function () {
+      try {
+        var key = 'aah-theme';
+        var saved = localStorage.getItem(key);
+        var dark = saved === 'dark' || (!saved && window.matchMedia('(prefers-color-scheme: dark)').matches);
+        if (dark) document.documentElement.setAttribute('data-theme', 'dark');
+      } catch (e) {}
+    })();
+  </script>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>页面不存在 · Archive at Home</title>
+  <meta name="robots" content="noindex" />
+  <link rel="icon" href="data:," />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;700&family=Noto+Serif+SC:wght@500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/assets/theme.css" />
+  <style>
+    /* Claude 风格 404：居中、留白、无页脚 */
+    body {
+      display: grid;
+      place-items: center;
+      min-height: 100vh;
+      min-height: 100svh;
+    }
+    .not-found {
+      max-width: 480px;
+      padding: 40px 24px;
+      text-align: center;
+    }
+    .not-found .brand-mark {
+      width: 30px;
+      height: 30px;
+    }
+    .not-found .not-found-brand {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 48px;
+      color: var(--on-surface);
+      font-family: var(--font-serif);
+      font-size: 1.25rem;
+      font-weight: 600;
+      text-decoration: none;
+    }
+    .not-found h1 {
+      margin-bottom: 14px;
+      font-size: 1.65rem;
+      font-weight: 600;
+    }
+    .not-found p {
+      margin: 0 0 32px;
+      color: var(--on-surface-variant);
+      font-size: 0.98rem;
+    }
+  </style>
+</head>
+<body>
+  <main class="not-found">
+    <a class="not-found-brand" href="/">
+      <svg class="brand-mark" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+        <path d="M12 1c.9 3.2 2 4.6 3.3 5.9C16.6 8.2 18 9.3 21.2 10.2c.4.1.4.7 0 .8-3.2.9-4.6 2-5.9 3.3C14 15.6 12.9 17 12 20.2c-.1.4-.7.4-.8 0-.9-3.2-2-4.6-3.3-5.9C6.6 13 5.2 11.9 2 11c-.4-.1-.4-.7 0-.8C5.2 9.3 6.6 8.2 7.9 6.9 9.2 5.6 10.3 4.2 11.2 1c.1-.4.7-.4.8 0Z"/>
+        <circle cx="19" cy="18.5" r="2.2"/>
+        <circle cx="5" cy="18.5" r="2.2"/>
+      </svg>
+      <span>Archive at Home</span>
+    </a>
+    <h1>页面不存在</h1>
+    <p>此页面不存在或已迁移。</p>
+    <a class="btn btn-dark" href="/">回到首页</a>
+  </main>
+</body>
+</html>
+

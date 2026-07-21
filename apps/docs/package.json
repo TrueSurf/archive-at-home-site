@@ -1,0 +1,17 @@
+{
+  "name": "@archive-at-home/docs",
+  "private": true,
+  "type": "module",
+  "version": "1.0.0",
+  "scripts": {
+    "dev": "vitepress dev --host 127.0.0.1 --port 5173",
+    "build": "vitepress build",
+    "preview": "vitepress preview --host 127.0.0.1 --port 5173"
+  },
+  "dependencies": {
+    "js-yaml": "^4.1.0"
+  },
+  "devDependencies": {
+    "vitepress": "^2.0.0-alpha.17"
+  }
+}

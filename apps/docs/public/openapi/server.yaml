@@ -1,0 +1,228 @@
+openapi: 3.1.0
+info:
+  title: Archive-at-Home Server API
+  version: 1.0.0
+servers:
+  - url: https://api.archive-at-home.org
+
+components:
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: API Key
+
+  schemas:
+    User:
+      type: object
+      properties:
+        id:
+          type: string
+          example: abc123
+        email:
+          type: string
+          format: email
+          example: user@example.com
+          nullable: true
+        nickname:
+          type: string
+          example: 用户昵称
+        provider:
+          type: string
+          example: email
+        telegram_id:
+          type: integer
+          example: 1234567890
+          nullable: true
+        api_key:
+          type: string
+          example: sk-xxxxxxxxxxxx
+        status:
+          type: string
+          example: active
+        level:
+          type: integer
+          example: 0
+        last_used_at:
+          type: string
+          format: date-time
+          nullable: true
+        created_at:
+          type: string
+          format: date-time
+
+    MeResponse:
+      type: object
+      properties:
+        user:
+          $ref: '#/components/schemas/User'
+        balance:
+          type: integer
+          example: 900
+
+    BalanceResponse:
+      type: object
+      properties:
+        balance:
+          type: integer
+          example: 900
+
+    ResetKeyResponse:
+      type: object
+      properties:
+        api_key:
+          type: string
+          example: sk-newxxxxxxxxxxxx
+
+    ParseRequest:
+      type: object
+      required: [gallery_id, gallery_key]
+      properties:
+        gallery_id:
+          type: string
+          example: '3858751'
+        gallery_key:
+          type: string
+          example: d3de60e849
+        force:
+          type: boolean
+          default: false
+
+    ParseSuccessResponse:
+      type: object
+      properties:
+        cached:
+          type: boolean
+          example: false
+        gp_cost:
+          type: integer
+          example: 180
+        archive_url:
+          type: string
+          format: uri
+          example: https://example.com/archive.zip
+
+    ParseCachedResponse:
+      type: object
+      properties:
+        cached:
+          type: boolean
+          example: true
+        archive_url:
+          type: string
+          format: uri
+          example: https://example.com/archive.zip
+
+    ParseErrorResponse:
+      type: object
+      properties:
+        error:
+          type: string
+          example: rate limited, try again later
+
+    AuthErrorResponse:
+      type: object
+      properties:
+        error:
+          type: string
+      required: [error]
+
+  responses:
+    UnauthorizedError:
+      description: 未认证或 API Key 无效
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/AuthErrorResponse'
+          examples:
+            missingAuthorizationHeader:
+              summary: 缺少或格式错误的 Authorization 头
+              value:
+                error: 'missing or malformed Authorization header (expected: Bearer <api-key>)'
+            invalidApiKey:
+              summary: API Key 无效
+              value:
+                error: invalid api key
+
+paths:
+  /api/v1/me:
+    get:
+      summary: 获取当前用户信息和余额
+      security:
+        - BearerAuth: []
+      responses:
+        '200':
+          description: 成功
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MeResponse'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+
+  /api/v1/me/reset-key:
+    post:
+      summary: 重置 API Key（旧 Key 立即失效）
+      security:
+        - BearerAuth: []
+      responses:
+        '200':
+          description: 成功
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResetKeyResponse'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+
+  /api/v1/me/balance:
+    get:
+      summary: 获取当前令牌数量（GP 余额）
+      security:
+        - BearerAuth: []
+      responses:
+        '200':
+          description: 成功
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BalanceResponse'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+
+  /api/v1/parse:
+    post:
+      summary: 请求解析画廊的归档下载链接
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: X-Client
+          in: header
+          required: false
+          schema:
+            type: string
+            maxLength: 64
+          description: |
+            客户端标识。第三方应用需提供，私有脚本可不填。
+
+            仅接受 `a-z`、`0-9`、`-`、`_`、`.` 和单个 `/`
+
+            推荐格式：`大类/应用标识`，例如 `bot/tg-official`、`tampermonkey/aah-download-helper`、`app/jhentai`。
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ParseRequest'
+      responses:
+        '200':
+          description: 成功、命中缓存或请求失败
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  - $ref: '#/components/schemas/ParseSuccessResponse'
+                  - $ref: '#/components/schemas/ParseCachedResponse'
+                  - $ref: '#/components/schemas/ParseErrorResponse'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
