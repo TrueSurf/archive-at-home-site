@@ -103,7 +103,9 @@ function activatePageLink(item: NavLink) {
 }
 
 function siteHref(link: string) {
-  if (link === '__main__') return '/'
+  if (link === '__main__') {
+    return (import.meta.env.BASE_URL || '/docs/').replace(/docs\/?$/, '') || '/'
+  }
   if (link.startsWith('http')) return link
   return withBase(link)
 }

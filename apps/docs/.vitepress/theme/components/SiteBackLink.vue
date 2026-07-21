@@ -1,12 +1,13 @@
 <script setup lang="ts">
 /**
- * 返回主站：主站根路径。
- * 必须带 target，否则 VitePress 会拦截同域 / 并当文档路由处理。
+ * 返回主站：从 VitePress base（.../docs/）推导主站根路径。
+ * 必须带 target，否则 SPA 会拦截同域跳转。
  */
+const mainHome = (import.meta.env.BASE_URL || '/docs/').replace(/docs\/?$/, '') || '/'
 </script>
 
 <template>
-  <a class="nav-text-link nav-text-link--brand" href="/" target="_self">返回主站</a>
+  <a class="nav-text-link nav-text-link--brand" :href="mainHome" target="_self">返回主站</a>
 </template>
 
 <style scoped>

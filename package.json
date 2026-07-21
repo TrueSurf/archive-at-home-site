@@ -11,7 +11,8 @@
     "docs:dev": "npm run dev -w @archive-at-home/docs",
     "docs:build": "npm run build -w @archive-at-home/docs",
     "docs:preview": "npm run preview -w @archive-at-home/docs",
-    "build": "npm run docs:build && node scripts/assemble.mjs"
+    "build": "npm run docs:build && node scripts/assemble.mjs",
+    "build:gh": "node scripts/build-gh.mjs"
   },
   "engines": {
     "node": ">=20"

@@ -1,13 +1,17 @@
 import { defineConfig } from 'vitepress'
+import { getDocsBase, getMainHome, getSiteBase } from '../../../scripts/site-base.mjs'
+
+const siteBase = getSiteBase()
+const docsBase = getDocsBase()
+const mainHome = getMainHome()
 
 // https://vitepress.dev/reference/site-config
 export default defineConfig({
   title: 'Archive at Home 文档',
   description: 'Archive at Home 使用指南、节点部署与 API 文档',
-  // 部署在主站 /docs 路径下；本地 dev 同样以 /docs/ 为前缀
-  base: '/docs/',
+  // 本地默认 /docs/；GitHub Project Pages 为 /archive-at-home-site/docs/
+  base: docsBase,
   cleanUrls: true,
-  // 使用自定义 data-theme，与主站共用 aah-theme
   appearance: false,
   server: {
     host: '127.0.0.1',
@@ -17,7 +21,7 @@ export default defineConfig({
     [
       'script',
       {},
-      `try{var k='aah-theme';var s=localStorage.getItem(k);var d=s==='dark'||(!s&&matchMedia('(prefers-color-scheme: dark)').matches);if(d)document.documentElement.setAttribute('data-theme','dark')}catch(e){}`,
+      "try{var k='aah-theme';var s=localStorage.getItem(k);var d=s==='dark'||(!s&&matchMedia('(prefers-color-scheme: dark)').matches);if(d)document.documentElement.setAttribute('data-theme','dark')}catch(e){}",
     ],
     ['link', { rel: 'preconnect', href: 'https://fonts.googleapis.com' }],
     ['link', { rel: 'preconnect', href: 'https://fonts.gstatic.com', crossorigin: '' }],
@@ -32,15 +36,17 @@ export default defineConfig({
   ],
   themeConfig: {
     logo: '/logo.svg',
-    // 字符串形式不会被 withBase 处理；点 logo 回文档首页
-    logoLink: '/docs/',
+    // 字符串不被 withBase 处理，需写完整 docs 根路径
+    logoLink: docsBase,
     siteTitle: 'Archive at Home 文档',
     docFooter: {
       prev: '上一页',
       next: '下一页',
     },
+    // 供主题读取主站根路径（返回主站按钮）
+    mainHome,
+    siteBase,
 
-    // 「首页 / 返回主站」由主题插槽注入（同域根路径不能走 withBase）
     nav: [
       { text: '使用指南', link: '/use' },
       { text: '节点部署', link: '/node' },

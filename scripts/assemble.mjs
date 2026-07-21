@@ -47,6 +47,9 @@ if (!existsSync(site404)) {
     .replaceAll('src="assets/', 'src="../assets/')
     .replaceAll("src='assets/", "src='../assets/")
     .replaceAll('src="/assets/', 'src="../assets/')
+    // 文档子目录中的 404：回主站应上一级
+    .replaceAll('href="./"', 'href="../"')
+    .replaceAll("href='./'", "href='../'")
   writeFileSync(docs404, html)
 }
 
@@ -114,3 +117,4 @@ console.log('已组装: ' + target)
 console.log('已统一 404: ' + docs404)
 console.log('已修正 stylesheet 引用 / 生成 clean URL 目录')
 console.log('已写入 apps/site/.nojekyll')
+
