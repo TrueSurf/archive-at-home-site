@@ -13,6 +13,16 @@ export default defineConfig({
   base: docsBase,
   cleanUrls: true,
   appearance: false,
+  transformPageData(pageData) {
+    pageData.frontmatter.navbar = false
+  },
+  vue: {
+    template: {
+      compilerOptions: {
+        isCustomElement: (tag) => tag === 'site-navbar' || tag === 'site-footer',
+      },
+    },
+  },
   markdown: {
     theme: {
       light: 'github-light',
@@ -27,7 +37,7 @@ export default defineConfig({
     [
       'script',
       {},
-      "try{var k='aah-theme';var s=localStorage.getItem(k);var d=s==='dark'||(!s&&matchMedia('(prefers-color-scheme: dark)').matches);if(d){document.documentElement.setAttribute('data-theme','dark');document.documentElement.classList.add('dark')}}catch(e){}",
+      "try{var d=matchMedia('(prefers-color-scheme: dark)').matches;document.documentElement.classList.toggle('dark',d);document.documentElement.toggleAttribute('data-theme',d)}catch(e){}",
     ],
     ['link', { rel: 'preconnect', href: 'https://fonts.googleapis.com' }],
     ['link', { rel: 'preconnect', href: 'https://fonts.gstatic.com', crossorigin: '' }],
@@ -41,10 +51,6 @@ export default defineConfig({
     ],
   ],
   themeConfig: {
-    logo: '/logo.svg',
-    // 字符串不被 withBase 处理，需写完整 docs 根路径
-    logoLink: docsBase,
-    siteTitle: 'Archive at Home 文档',
     docFooter: {
       prev: '上一页',
       next: '下一页',
@@ -52,6 +58,7 @@ export default defineConfig({
     // 供主题读取主站根路径（返回主站按钮）
     mainHome,
     siteBase,
+    docsBase,
 
     nav: [
       { text: '使用指南', link: '/use' },

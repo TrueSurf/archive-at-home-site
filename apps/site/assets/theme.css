@@ -66,7 +66,7 @@
   --page-inline: 20px;
 }
 
-/* ---------- 深色模式：暖黑底 + 青绿强调 ---------- */
+/* ---------- 深色模式：跟随设备偏好 ---------- */
 
 html[data-theme="dark"] {
   color-scheme: dark;
@@ -102,10 +102,10 @@ html[data-theme="dark"] {
   --warning-container: #3a2e14;
   --on-warning-container: #f0d9a0;
 
-  /* 代码块·深色独立风格（抬亮底 + 高对比正文，配合 github-dark 高亮） */
-  --code-bg: #1c2128;
-  --code-border: #3d444d;
-  --code-text: #e6edf3;
+  /* 深青灰底与主题青绿协调，同时保持代码高对比度 */
+  --code-bg: #122522;
+  --code-border: #28504a;
+  --code-text: #e3f2ef;
 
   --shadow-card: 0 1px 2px rgba(0, 0, 0, 0.25), 0 4px 16px rgba(0, 0, 0, 0.28);
   --shadow-pop: 0 2px 8px rgba(0, 0, 0, 0.28), 0 16px 40px rgba(0, 0, 0, 0.36);
@@ -179,19 +179,11 @@ code, kbd, pre {
   right: 0;
   z-index: 20;
   height: var(--header-h);
-  pointer-events: none;
-  background: transparent;
-  border-bottom: 1px solid transparent;
+  background: color-mix(in srgb, var(--surface) 94%, transparent);
+  border-bottom: 1px solid var(--outline-variant);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
   transition: background 0.2s ease, border-color 0.2s ease;
-}
-
-/* 下滑后永久展示完整 navbar */
-.site-header.is-scrolled {
-  pointer-events: auto;
-  background: var(--surface);
-  backdrop-filter: none;
-  -webkit-backdrop-filter: none;
-  border-bottom-color: var(--outline-variant);
 }
 
 .site-header-inner {
@@ -205,7 +197,6 @@ code, kbd, pre {
 }
 
 .site-logo {
-  pointer-events: auto;
   display: flex;
   align-items: center;
   gap: 10px;
@@ -219,6 +210,16 @@ code, kbd, pre {
 }
 .site-logo:hover { color: var(--brand-strong); text-decoration: none; }
 
+.site-logo-section {
+  margin-left: 2px;
+  padding-left: 12px;
+  border-left: 1px solid var(--outline);
+  color: var(--on-surface-variant);
+  font-family: var(--font-sans);
+  font-size: 0.9rem;
+  font-weight: 500;
+}
+
 .brand-mark {
   flex: none;
   width: 22px;
@@ -226,30 +227,17 @@ code, kbd, pre {
   color: var(--brand);
 }
 
-/* 右侧工具区：始终可点（主题切换）；nav 在下滑后才出现 */
 .site-header-end {
-  pointer-events: auto;
   display: flex;
   align-items: center;
   gap: 2px;
   margin-left: auto;
 }
 
-/* 进入页面不展示右侧导航；下滑后永久展示 */
 .site-nav {
-  display: none;
-  align-items: center;
-  gap: 2px;
-  opacity: 0;
-  transform: translateY(-6px);
-  transition: opacity 0.18s ease, transform 0.18s ease;
-}
-
-.site-header.is-scrolled .site-nav {
   display: flex;
   align-items: center;
-  opacity: 1;
-  transform: none;
+  gap: 2px;
 }
 
 /* 与文档页 VPNavBarMenuLink 统一：胶囊高度，不吃满 header */
@@ -276,6 +264,22 @@ code, kbd, pre {
 .site-nav > a.active {
   color: var(--on-brand-container);
   background: var(--brand-container);
+}
+
+.site-nav > a.nav-home-link {
+  margin-left: 8px;
+  color: #ffffff;
+  background: var(--brand);
+  font-weight: 600;
+}
+.site-nav > a.nav-home-link:hover {
+  color: #ffffff;
+  background: var(--brand-strong);
+}
+
+html[data-theme="dark"] .site-nav > a.nav-home-link,
+html[data-theme="dark"] .site-nav > a.nav-home-link:hover {
+  color: #06221f;
 }
 
 .nav-social {
@@ -309,31 +313,6 @@ code, kbd, pre {
 .site-nav .nav-icon-link svg,
 .nav-icon-link svg { display: block; width: 20px; height: 20px; flex: none; }
 
-/* 主题切换按钮 */
-.theme-toggle {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 36px;
-  height: 36px;
-  padding: 0;
-  border: 0;
-  border-radius: var(--radius-m);
-  background: transparent;
-  color: var(--on-surface-variant);
-  cursor: pointer;
-  transition: color 0.15s ease, background 0.15s ease;
-}
-.theme-toggle:hover {
-  color: var(--on-surface);
-  background: var(--surface-container);
-}
-.theme-toggle svg { display: block; width: 20px; height: 20px; flex: none; }
-.theme-toggle .icon-sun { display: none; }
-.theme-toggle .icon-moon { display: block; }
-html[data-theme="dark"] .theme-toggle .icon-sun { display: block; }
-html[data-theme="dark"] .theme-toggle .icon-moon { display: none; }
-
 .nav-toggle {
   display: none;
   padding: 8px;
@@ -344,11 +323,9 @@ html[data-theme="dark"] .theme-toggle .icon-moon { display: none; }
   cursor: pointer;
 }
 
-.nav-toggle[hidden] { display: none !important; }
-
 @media (max-width: 860px) {
-  .site-header.is-scrolled .nav-toggle:not([hidden]) { display: inline-flex; }
-  .site-header.is-scrolled .site-nav {
+  .nav-toggle { display: inline-flex; }
+  .site-nav {
     display: none;
     position: absolute;
     top: var(--header-h);
@@ -364,8 +341,9 @@ html[data-theme="dark"] .theme-toggle .icon-moon { display: none; }
     background: var(--surface);
     border-bottom: 1px solid var(--outline-variant);
   }
-  .site-header.is-scrolled .site-nav.open { display: flex; }
+  .site-nav.open { display: flex; }
   .site-nav > a:not(.nav-icon-link) { padding: 8px 12px; line-height: 1.2; }
+  .site-nav > a.nav-home-link { margin: 6px 0; justify-content: center; }
   .nav-social {
     margin-left: 0;
     padding: 8px 0 0;
@@ -382,6 +360,11 @@ html[data-theme="dark"] .theme-toggle .icon-moon { display: none; }
   color: var(--on-surface-dim);
   font-size: 0.88rem;
   background: var(--surface-container);
+}
+
+site-footer {
+  display: block;
+  width: 100%;
 }
 
 .site-footer .container {

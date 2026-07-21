@@ -18,12 +18,20 @@ import {
 } from 'node:fs'
 import { join, extname, basename } from 'node:path'
 import { fileURLToPath } from 'node:url'
+import { getMainHome, getSiteBase } from './site-base.mjs'
 
 const siteRoot = fileURLToPath(new URL('../apps/site', import.meta.url))
 const docsDist = fileURLToPath(new URL('../apps/docs/.vitepress/dist', import.meta.url))
 const target = join(siteRoot, 'docs')
 const site404 = join(siteRoot, '404.html')
 const docs404 = join(target, '404.html')
+const siteBase = getSiteBase()
+
+function renderNotFound(html) {
+  return html
+    .replaceAll('__SITE_HOME__', getMainHome())
+    .replaceAll('__SITE_ASSETS__', `${siteBase}/assets`)
+}
 
 if (!existsSync(docsDist)) {
   console.error('未找到 docs 构建产物，请先运行 npm run docs:build')
@@ -39,17 +47,9 @@ if (!existsSync(site404)) {
   process.exit(1)
 }
 {
-  let html = readFileSync(site404, 'utf8')
-  html = html
-    .replaceAll('href="assets/', 'href="../assets/')
-    .replaceAll("href='assets/", "href='../assets/")
-    .replaceAll('href="/assets/', 'href="../assets/')
-    .replaceAll('src="assets/', 'src="../assets/')
-    .replaceAll("src='assets/", "src='../assets/")
-    .replaceAll('src="/assets/', 'src="../assets/')
-    // 文档子目录中的 404：回主站应上一级
-    .replaceAll('href="./"', 'href="../"')
-    .replaceAll("href='./'", "href='../'")
+  const source = readFileSync(site404, 'utf8')
+  const html = renderNotFound(source)
+  writeFileSync(site404, html)
   writeFileSync(docs404, html)
 }
 

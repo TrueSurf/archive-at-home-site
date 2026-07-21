@@ -113,222 +113,15 @@ body {
   background: var(--surface);
 }
 
-/* ---------- 顶部导航：与主页一致（logo 左 / 右侧整块：首页…菜单…社交…mailto…主题） ---------- */
+/* ---------- 共享站点顶栏 / 根布局 ---------- */
 
-:root {
-  /* 与主站 site-header 毛玻璃底一致 */
-  --vp-nav-bg-color: var(--surface);
-  --vp-c-divider: var(--outline-variant);
-}
-
-.VPNav {
+.Layout > site-navbar {
+  position: relative;
   z-index: 100001;
-  /* 边框只画在 VPNavBar 上，避免双线比主页更粗 */
-  border-bottom: 0 !important;
-  background: transparent;
 }
 
-.VPNavBar,
-.VPNavBar.home,
-.VPNavBar.home.top,
-.VPNavBar.has-sidebar,
-.VPNavBar:not(.home) {
-  background: var(--vp-nav-bg-color) !important;
-  background-color: var(--vp-nav-bg-color) !important;
-  border-bottom: 1px solid var(--outline-variant) !important;
-}
-
-/* 覆盖 VP 默认：桌面 has-sidebar / home 透明背景 */
-@media (min-width: 960px) {
-  .VPNavBar:not(.home),
-  .VPNavBar.has-sidebar,
-  .VPNavBar.home,
-  .VPNavBar.home.top,
-  .VPNavBar:not(.has-sidebar):not(.home.top) {
-    background: var(--vp-nav-bg-color) !important;
-    background-color: var(--vp-nav-bg-color) !important;
-  }
-}
-
-/* 隐藏 VP 自带 divider，防止下边框看起来更宽 */
-.VPNavBar .divider {
-  display: none !important;
-}
-
-.VPNavScreen {
-  z-index: 100000;
-  background: var(--surface);
-}
-
-.VPNavBar .wrapper {
-  max-width: none !important;
-  padding: 0 !important;
-  background: transparent;
-}
-
-.VPNavBar .container {
-  display: flex !important;
-  align-items: center !important;
-  justify-content: space-between !important;
-  max-width: none !important;
-  width: 100% !important;
-  height: var(--vp-nav-height) !important;
-  margin: 0 !important;
-  padding-left: var(--page-inline, 20px) !important;
-  padding-right: var(--page-inline, 20px) !important;
-  background: transparent;
-}
-
-/* Logo 区：垂直居中，取消 has-sidebar 绝对定位 */
-.VPNavBar.has-sidebar .title,
-.VPNavBar .title {
-  position: static !important;
-  top: auto !important;
-  left: auto !important;
-  z-index: auto !important;
-  display: flex !important;
-  align-items: center !important;
-  flex-shrink: 0;
-  width: auto !important;
-  max-width: none !important;
-  height: var(--vp-nav-height) !important;
-  padding: 0 16px 0 0 !important;
-  border-bottom: 0 !important;
-  background: transparent !important;
-}
-
-.VPNavBar.has-sidebar .content,
-.VPNavBar .content {
-  position: relative !important;
-  flex: 1 1 auto !important;
-  display: flex !important;
-  align-items: center !important;
-  justify-content: flex-end !important;
-  height: var(--vp-nav-height) !important;
-  padding-left: 0 !important;
-  padding-right: 0 !important;
-  border-bottom: 0 !important;
-  background: transparent !important;
-}
-
-.VPNavBar .content-body {
-  display: flex !important;
-  align-items: center !important;
-  justify-content: flex-end !important;
-  gap: 2px;
-  flex: 0 1 auto !important;
-  width: auto !important;
-  max-width: 100%;
-  height: var(--vp-nav-height) !important;
-  margin-right: 0 !important;
-  padding-right: 0 !important;
-  /* 背景由 VPNavBar 提供，避免半截透明 */
-  background: transparent !important;
-}
-
-/* 空搜索占位会 flex-grow 把「首页」顶到中间 —— 关掉 */
-.VPNavBarSearch {
-  display: none !important;
-  flex-grow: 0 !important;
-  width: 0 !important;
-  padding: 0 !important;
-  margin: 0 !important;
-  overflow: hidden;
-}
-
-.VPNavBarTitle {
-  display: flex;
-  align-items: center;
-  height: 100%;
-}
-
-.VPNavBarTitle .title {
-  display: inline-flex !important;
-  align-items: center !important;
-  gap: 10px;
-  width: auto !important;
-  height: auto !important;
-  min-height: 0;
-  padding: 0 !important;
-  font-family: var(--font-serif);
-  font-size: 1.05rem;
-  font-weight: 600;
-  line-height: 1.2;
-  color: var(--on-surface);
-  border-bottom: 0 !important;
-}
-
-.VPNavBarTitle.has-sidebar .title {
-  border-bottom-color: transparent !important;
-}
-
-.VPNavBarTitle .title .VPImage.logo,
-.VPNavBarTitle .logo {
-  width: 22px !important;
-  height: 22px !important;
-  margin-right: 0 !important;
-}
-
-/* 顺序：首页 → 菜单(…API) → 返回主站 → 四图标工具组 → Extra/Hamburger */
-.VPNavBar .content-body > .nav-text-link { order: 1; }
-.VPNavBar .content-body > .VPNavBarMenu,
-.VPNavBar .content-body > .menu { order: 2; }
-.VPNavBar .content-body > .nav-end-wrap {
-  display: contents;
-}
-.VPNavBar .content-body .nav-end-wrap > .nav-text-link--brand { order: 3; }
-.VPNavBar .content-body > .VPNavBarSocialLinks,
-.VPNavBar .content-body > .social-links { order: 4; }
-.VPNavBar .content-body .nav-end-tools {
-  order: 5;
-  display: inline-flex;
-  align-items: center;
-  gap: 2px;
-}
-.VPNavBar .content-body > .VPNavBarExtra,
-.VPNavBar .content-body > .extra { order: 6; }
-.VPNavBar .content-body > .VPNavBarHamburger,
-.VPNavBar .content-body > .hamburger { order: 7; }
-
-.VPNavBarMenu {
-  display: flex !important;
-  align-items: center !important;
-  height: var(--vp-nav-height);
-  margin-right: 0 !important;
-}
-
-/* 高亮与主站一致：胶囊高度，不吃满 NavBar */
-.VPNavBarMenuLink,
-.VPNavBarMenuGroup .button {
-  display: inline-flex !important;
-  align-items: center !important;
-  align-self: center !important;
-  height: auto !important;
-  min-height: 0 !important;
-  padding: 7px 14px !important;
-  border-radius: var(--radius-m) !important;
-  color: var(--on-surface-variant) !important;
-  font-size: 0.92rem !important;
-  font-weight: 500 !important;
-  line-height: 1.2 !important;
-  transition: color 0.15s ease, background 0.15s ease !important;
-}
-
-.VPNavBarMenuLink:hover,
-.VPNavBarMenuGroup .button:hover {
-  color: var(--on-surface) !important;
-  background: var(--surface-container) !important;
-}
-
-.VPNavBarMenuLink.active {
-  color: var(--on-brand-container) !important;
-  background: var(--brand-container) !important;
-}
-
-/* VP 默认 socialLinks 已停用，图标改由 .nav-end-tools 统一渲染 */
-.VPNavBar .menu + .social-links::before,
-.VPNavBar .appearance + .social-links::before {
-  display: none !important;
+.VPContent {
+  padding-top: var(--vp-nav-height);
 }
 /* ---------- 隐藏默认侧栏 / 右侧大纲，由 UnifiedLocalNav 接管 ---------- */
 
@@ -390,40 +183,9 @@ body {
     margin: 0 auto;
   }
 
-  /* 文档正文页 footer：吃满左侧栏以外的右侧宽度 */
-  .VPDoc .docs-footer {
-    max-width: none;
-    width: 100%;
-    margin-left: 0;
-    margin-right: 0;
-    padding-left: 40px;
-    padding-right: 40px;
-    box-sizing: border-box;
-  }
-
-  .VPDoc .docs-footer .container {
-    max-width: none;
-    width: 100%;
-    padding-left: 0;
-    padding-right: 0;
-  }
-
-  /* 文档主页 footer：吃满整页宽度 */
-  .VPHome .docs-footer {
-    max-width: none;
-    width: 100%;
-    margin-left: 0;
-    margin-right: 0;
-    padding-left: var(--page-inline, 24px);
-    padding-right: var(--page-inline, 24px);
-    box-sizing: border-box;
-  }
-
-  .VPHome .docs-footer .container {
-    max-width: none;
-    width: 100%;
-    padding-left: 0;
-    padding-right: 0;
+  .Layout > site-footer.docs-page-footer {
+    width: calc(100% - var(--vp-sidebar-width));
+    margin-left: var(--vp-sidebar-width);
   }
 }
 
@@ -723,21 +485,14 @@ html[data-theme='dark'] .vp-doc :not(pre) > code {
     padding-inline: 18px;
   }
 
-  .VPSocialLinks {
-    margin-left: 0;
-    padding-left: 0;
-    border-left: 0;
-  }
 }
 
 /* ---------- 统一 404 ---------- */
 
-.Layout:has(.not-found) .VPNav,
 .Layout:has(.not-found) .VPLocalNav,
 .Layout:has(.not-found) .VPSidebar,
 .Layout:has(.not-found) .VPFooter,
-.Layout:has(.not-found) .UnifiedLocalNav,
-.Layout:has(.not-found) .docs-footer {
+.Layout:has(.not-found) .UnifiedLocalNav {
   display: none !important;
 }
 
@@ -755,83 +510,7 @@ html[data-theme='dark'] .vp-doc :not(pre) > code {
   display: none !important;
 }
 
-/* ---------- NavBar 四图标统一（TG / Mail / GH / Theme） ---------- */
-
-.VPSocialLinks {
-  display: none !important; /* 改由自定义 Telegram 图标接管，避免图标字体与 SVG 混用 */
-}
-
-.nav-end-tools {
-  display: inline-flex;
-  align-items: center;
-  gap: 2px;
-  margin-left: 8px;
-  padding-left: 10px;
-  border-left: 1px solid var(--outline-variant);
-}
-
-.nav-end-tools .nav-icon-link,
-.nav-end-tools .MailLink,
-.nav-end-tools .GitHubLink,
-.nav-end-tools .TelegramLink,
-.nav-end-tools .theme-toggle {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 36px;
-  height: 36px;
-  padding: 0;
-  border: 0;
-  border-radius: var(--radius-m);
-  background: transparent;
-  color: var(--on-surface-variant);
-  text-decoration: none;
-  cursor: pointer;
-  transition: color 0.15s ease, background 0.15s ease;
-}
-
-.nav-end-tools .nav-icon-link:hover,
-.nav-end-tools .MailLink:hover,
-.nav-end-tools .GitHubLink:hover,
-.nav-end-tools .TelegramLink:hover,
-.nav-end-tools .theme-toggle:hover {
-  color: var(--on-surface);
-  background: var(--surface-container);
-  text-decoration: none;
-}
-
-.nav-end-tools .nav-icon-link svg,
-.nav-end-tools .MailLink svg,
-.nav-end-tools .GitHubLink svg,
-.nav-end-tools .TelegramLink svg,
-.nav-end-tools .theme-toggle svg {
-  display: block;
-  width: 20px;
-  height: 20px;
-  flex: none;
-}
-
-.nav-end-tools .theme-toggle {
-  margin-left: 0;
-}
-
-@media (max-width: 640px) {
-  .nav-end-tools {
-    margin-left: 0;
-    padding-left: 0;
-    border-left: 0;
-  }
-
-  .VPNavScreen .nav-end-tools {
-    margin-left: 0;
-    padding: 12px 0;
-    border-left: 0;
-    gap: 8px;
-  }
-}
-
-
-/* ---------- 文档首页：去掉底部空白（覆盖 VP 默认 margin-bottom） ---------- */
+/* ---------- 文档页根布局 / Footer ---------- */
 
 .Layout {
   display: flex;
@@ -846,12 +525,6 @@ html[data-theme='dark'] .vp-doc :not(pre) > code {
   flex: 1 1 auto;
   width: 100%;
   min-height: 0;
-}
-
-@media (min-width: 960px) {
-  .VPContent.is-home {
-    min-height: calc(100svh - var(--vp-nav-height));
-  }
 }
 
 .VPHome {
@@ -873,14 +546,9 @@ div.VPHome {
   padding-bottom: 24px !important;
 }
 
-/* 首页 footer 贴底，下方不再留空 */
-.VPHome .docs-footer {
-  margin-top: auto !important;
-  margin-bottom: 0 !important;
-}
-
-.VPHome .docs-footer.site-footer {
-  padding-bottom: 40px;
+.Layout > site-footer {
+  flex: none;
+  margin-top: 0;
 }
 
 /* home-features-after 之后的空 Content / vp-doc 占位隐藏 */
