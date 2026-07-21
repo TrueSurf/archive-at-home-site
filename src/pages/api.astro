@@ -1,0 +1,197 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Endpoint from '../components/Endpoint.astro';
+import { site } from '../data/site';
+---
+
+<BaseLayout title="API 文档" bg="api" bgPosition="center 20%">
+  <div class="container prose page-shell">
+    <div class="section-title">
+      <span class="section-mark"></span>
+      <h2>API 文档</h2>
+    </div>
+    <p class="section-desc">
+      面向普通用户的开放接口。Base URL：<code>{site.apiBase}</code>，CORS 不限来源。
+      示例中的 <code>sk-…</code> 替换为你的 API Key。
+    </p>
+
+    <h2 id="auth">认证与凭证</h2>
+    <p>
+      所有业务接口通过 <code>Authorization</code> 头携带 API Key：
+    </p>
+    <div class="codeblock">
+      <span class="codeblock-tag">HTTP</span>
+      <pre>Authorization: Bearer sk-xxxxxxxxxxxx</pre>
+    </div>
+    <p>
+      API Key 通过 Telegram 登录获取（首次登录自动注册）：在<a href="/use">使用页</a>点「Telegram 登录」，
+      或直接访问登录中转页 <code>GET /auth/telegram/login</code>（见下文<a href="#telegram-login">集成说明</a>）。
+      Key 泄露时调用<a href="#reset-key">重置接口</a>换新，旧 Key 立即失效。
+    </p>
+
+    <h4 style="margin:24px 0 8px;">来源标记 X-Client（可选）</h4>
+    <p>
+      请求头 <code>X-Client: 大类/应用标识</code> 用于标记调用来源并写入任务日志，例如
+      <code>bot/tg-official</code>、<code>tampermonkey/aah-download-helper</code>、<code>app/jhentai</code>。
+      仅接受小写字母、数字、<code>-</code>、<code>_</code>、<code>.</code> 和单个 <code>/</code>，最长 64 字符；
+      不传或非法时服务端按 User-Agent 自动识别。
+    </p>
+
+    <h2 id="endpoints">接口一览</h2>
+
+    <Endpoint method="POST" path="/api/v1/parse" summary="核心接口：请求解析画廊的归档下载链接。" id="parse">
+      <h4>请求体</h4>
+      <table>
+        <thead><tr><th>字段</th><th>类型</th><th>必填</th><th>说明</th></tr></thead>
+        <tbody>
+          <tr><td><code>gallery_id</code></td><td>string</td><td>是</td><td>画廊 ID，即链接 <code>/g/&#123;id&#125;/&#123;key&#125;/</code> 中的数字</td></tr>
+          <tr><td><code>gallery_key</code></td><td>string</td><td>是</td><td>画廊密钥，链接中的第二段</td></tr>
+          <tr><td><code>force</code></td><td>boolean</td><td>否</td><td>为 <code>true</code> 时忽略 7 天缓存强制重新解析（仍会消耗 GP）</td></tr>
+        </tbody>
+      </table>
+
+      <h4>响应</h4>
+      <table>
+        <thead><tr><th>字段</th><th>类型</th><th>说明</th></tr></thead>
+        <tbody>
+          <tr><td><code>cached</code></td><td>boolean</td><td>是否命中缓存。命中时不产生 GP 消耗</td></tr>
+          <tr><td><code>gp_cost</code></td><td>number</td><td>本次新解析实际消耗的 GP（缓存命中时无此字段）</td></tr>
+          <tr><td><code>archive_url</code></td><td>string</td><td>归档下载链接</td></tr>
+        </tbody>
+      </table>
+
+      <div class="codeblock">
+        <span class="codeblock-tag">curl</span>
+        <pre>{`curl -X POST ${site.apiBase}/api/v1/parse \\
+  -H "Authorization: Bearer sk-xxxxxxxxxxxx" \\
+  -H "X-Client: bot/my-app" \\
+  -H "Content-Type: application/json" \\
+  -d '{"gallery_id":"3858751","gallery_key":"d3de60e849"}'`}</pre>
+      </div>
+
+      <h4>试一试</h4>
+      <div class="tryit" data-method="POST" data-path="/api/v1/parse">
+        <div class="tryit-fields">
+          <input class="input" data-field="gallery_id" placeholder="gallery_id，如 3858751" autocomplete="off" spellcheck="false" />
+          <input class="input" data-field="gallery_key" placeholder="gallery_key，如 d3de60e849" autocomplete="off" spellcheck="false" />
+          <label class="checkline"><input type="checkbox" data-field="force" /> 强制重新解析（忽略缓存）</label>
+        </div>
+        <div class="btn-row">
+          <button class="btn btn-primary btn-sm tryit-run" type="button">发送请求</button>
+        </div>
+        <pre class="result-json"></pre>
+      </div>
+    </Endpoint>
+
+    <Endpoint method="GET" path="/api/v1/me" summary="获取当前用户信息、等级与令牌余额。" id="me">
+      <div class="codeblock">
+        <span class="codeblock-tag">响应示例</span>
+        <pre>{`{
+  "user": {
+    "id": "abc123",
+    "nickname": "用户昵称",
+    "provider": "telegram",
+    "telegram_id": 1234567890,
+    "api_key": "sk-xxxxxxxxxxxx",
+    "status": "active",
+    "level": 0,
+    "created_at": "2026-02-11T00:00:00Z"
+  },
+  "balance": 604800
+}`}</pre>
+      </div>
+      <h4>试一试</h4>
+      <div class="tryit" data-method="GET" data-path="/api/v1/me">
+        <div class="btn-row">
+          <button class="btn btn-primary btn-sm tryit-run" type="button">发送请求</button>
+        </div>
+        <pre class="result-json"></pre>
+      </div>
+    </Endpoint>
+
+    <Endpoint method="GET" path="/api/v1/me/balance" summary="只取当前令牌余额。令牌以固定速率自动补充，上限由用户等级决定。" id="balance">
+      <div class="codeblock">
+        <span class="codeblock-tag">响应示例</span>
+        <pre>{`{ "balance": 500000 }`}</pre>
+      </div>
+      <h4>试一试</h4>
+      <div class="tryit" data-method="GET" data-path="/api/v1/me/balance">
+        <div class="btn-row">
+          <button class="btn btn-primary btn-sm tryit-run" type="button">发送请求</button>
+        </div>
+        <pre class="result-json"></pre>
+      </div>
+    </Endpoint>
+
+    <Endpoint method="POST" path="/api/v1/me/reset-key" summary="重置 API Key，旧 Key 立即失效。怀疑泄露时使用。" id="reset-key">
+      <div class="callout callout-warn">
+        <span class="callout-icon">⚠</span>
+        <p>重置后所有使用旧 Key 的客户端（油猴脚本、JHenTai、Bot 绑定等）都需要更新为新 Key。</p>
+      </div>
+      <h4>试一试</h4>
+      <div class="tryit" data-method="POST" data-path="/api/v1/me/reset-key" data-confirm="确定要重置 API Key 吗？旧 Key 会立即失效。" data-save-key>
+        <div class="btn-row">
+          <button class="btn btn-ghost btn-sm tryit-run" type="button">重置我的 Key</button>
+        </div>
+        <pre class="result-json"></pre>
+      </div>
+    </Endpoint>
+
+    <Endpoint method="GET" path="/auth/telegram/login" summary="Telegram 登录中转页：第三方应用引导用户登录并回收 API Key。" id="telegram-login">
+      <h4>URL 参数</h4>
+      <table>
+        <thead><tr><th>参数</th><th>必填</th><th>说明</th></tr></thead>
+        <tbody>
+          <tr><td><code>redirect_url</code></td><td>否</td><td>登录成功后跳转地址，API Key 以查询参数形式附加</td></tr>
+          <tr><td><code>param_name</code></td><td>否</td><td>附加 API Key 的参数名，默认 <code>start</code></td></tr>
+          <tr><td><code>botId</code></td><td>否</td><td>Telegram Bot ID，用于 Mini App 内免跳转登录</td></tr>
+        </tbody>
+      </table>
+      <p style="color:var(--on-surface-variant);">示例：</p>
+      <div class="codeblock">
+        <span class="codeblock-tag">登录跳转</span>
+        <pre>{`${site.apiBase}/auth/telegram/login?redirect_url=https://your-app.example/callback&param_name=key`}</pre>
+      </div>
+      <p style="color:var(--on-surface-variant);">
+        用户授权后跳转到 <code>https://your-app.example/callback?key=sk-…</code>。
+        不传 <code>redirect_url</code> 时页面直接展示 Key 供用户复制。
+      </p>
+    </Endpoint>
+
+    <h2 id="rules">运行规则</h2>
+    <h3>令牌桶限流</h3>
+    <p>
+      解析消耗令牌（与 GP 等价）。普通用户令牌以 <strong>1 GP/秒</strong> 自动补充，容量上限
+      <strong>604,800</strong>（约 7 天积累量）；等级 ≥1 用户为 5 GP/秒、3,024,000。
+      令牌不足时接口返回 <code>rate limited, try again later</code>。
+    </p>
+    <h3>私有化缓存与请求合并</h3>
+    <p>
+      解析结果按「用户 × 画廊」缓存 <strong>7 天</strong>，期间重复请求直接命中，不重复消耗 GP；
+      同一用户对同一画廊的并发请求自动合并为一次解析。
+      需要最新链接时用 <code>force</code> 参数显式绕过缓存。
+    </p>
+    <h3>成本追踪</h3>
+    <p>
+      每次新解析返回 <code>gp_cost</code> 并写入任务日志，即节点账号实际消耗的 GP。
+    </p>
+  </div>
+</BaseLayout>
+
+<script>
+  import '../scripts/try-it';
+</script>
+
+<style>
+  .tryit {
+    margin-top: 8px;
+    padding: 16px;
+    border: 1px dashed color-mix(in srgb, var(--primary) 30%, transparent);
+    border-radius: var(--radius-m);
+    background: color-mix(in srgb, var(--primary) 4%, transparent);
+  }
+  .tryit .tryit-fields {
+    display: grid;
+    gap: 10px;
+  }
+</style>

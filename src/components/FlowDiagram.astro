@@ -1,0 +1,152 @@
+---
+/**
+ * 工作原理图：客户端 → 中控 → 志愿节点 → E-Hentai。
+ * 纯 HTML/CSS 实现，横向流程，窄屏自动折为纵向。
+ */
+---
+
+<div class="flow" role="img" aria-label="工作流程：用户通过客户端提交任务，中控服务器调度到志愿者节点，节点用自有账号配额向 E-Hentai 请求解析，最终把归档下载链接返回给用户。">
+  <div class="flow-node">
+    <div class="flow-title">你</div>
+    <div class="flow-chips">
+      <span>网页版</span>
+      <span>TG Bot</span>
+      <span>油猴脚本</span>
+      <span>JHenTai</span>
+      <span>你的应用</span>
+    </div>
+  </div>
+
+  <div class="flow-arrow" aria-hidden="true"></div>
+
+  <div class="flow-node flow-node-main">
+    <div class="flow-title">中控服务器</div>
+    <ul class="flow-list">
+      <li>按节点状态直接分配任务</li>
+      <li>每用户独立缓存 · 7 天</li>
+      <li>重复请求自动合并</li>
+      <li>令牌桶限流 · GP 成本追踪</li>
+    </ul>
+  </div>
+
+  <div class="flow-arrow" aria-hidden="true"></div>
+
+  <div class="flow-node">
+    <div class="flow-title">志愿者节点</div>
+    <ul class="flow-list">
+      <li>由志愿者部署维护</li>
+      <li>用节点自己的账号配额</li>
+      <li>完成解析并回报结果</li>
+    </ul>
+  </div>
+
+  <div class="flow-arrow" aria-hidden="true"></div>
+
+  <div class="flow-node flow-node-end">
+    <div class="flow-title">E-Hentai</div>
+    <div class="flow-desc">归档下载链接<br />原路返回</div>
+  </div>
+</div>
+
+<style>
+  .flow {
+    display: flex;
+    align-items: stretch;
+    gap: 0;
+    margin: 28px 0;
+  }
+
+  .flow-node {
+    flex: 1;
+    min-width: 0;
+    padding: 18px;
+    border: 1px solid color-mix(in srgb, var(--on-surface) 10%, transparent);
+    border-radius: var(--radius-l);
+    background: color-mix(in srgb, var(--surface-bright) 90%, transparent);
+  }
+
+  .flow-node-main {
+    border-color: var(--primary-strong);
+    background: color-mix(in srgb, var(--primary) 6%, var(--surface-bright));
+  }
+
+  .flow-node-end {
+    text-align: center;
+  }
+
+  .flow-title {
+    margin-bottom: 10px;
+    font-family: var(--font-serif);
+    font-weight: 700;
+    color: var(--primary);
+  }
+
+  .flow-node-end .flow-title { color: var(--on-surface); }
+
+  .flow-chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+
+  .flow-chips span {
+    padding: 3px 10px;
+    border: 1px solid var(--outline);
+    border-radius: 999px;
+    color: var(--on-surface-variant);
+    font-size: 0.78rem;
+    white-space: nowrap;
+  }
+
+  .flow-list {
+    margin: 0;
+    padding-left: 1.2em;
+    color: var(--on-surface-variant);
+    font-size: 0.85rem;
+  }
+  .flow-list li { margin: 5px 0; }
+  .flow-list li::marker { color: var(--primary-strong); }
+
+  .flow-desc {
+    color: var(--on-surface-variant);
+    font-size: 0.85rem;
+  }
+
+  .flow-arrow {
+    flex: none;
+    align-self: center;
+    width: 34px;
+    height: 2px;
+    margin: 0 6px;
+    background: linear-gradient(90deg, var(--primary-strong), var(--primary));
+    position: relative;
+  }
+  .flow-arrow::after {
+    content: '';
+    position: absolute;
+    right: -1px;
+    top: 50%;
+    width: 8px;
+    height: 8px;
+    border-top: 2px solid var(--primary);
+    border-right: 2px solid var(--primary);
+    transform: translateY(-50%) rotate(45deg);
+  }
+
+  @media (max-width: 860px) {
+    .flow { flex-direction: column; }
+    .flow-arrow {
+      width: 2px;
+      height: 26px;
+      margin: 6px auto;
+      background: linear-gradient(180deg, var(--primary-strong), var(--primary));
+    }
+    .flow-arrow::after {
+      right: auto;
+      left: 50%;
+      top: auto;
+      bottom: -1px;
+      transform: translateX(-50%) rotate(135deg);
+    }
+  }
+</style>
