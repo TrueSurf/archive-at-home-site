@@ -222,9 +222,9 @@ watch(
   width: 100vw;
   margin: 0 calc(50% - 50vw) 24px;
   border-bottom: 1px solid var(--outline-variant);
-  background: color-mix(in srgb, var(--surface) 88%, transparent);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
+  background: color-mix(in srgb, var(--surface) 82%, transparent);
+  backdrop-filter: saturate(140%) blur(16px);
+  -webkit-backdrop-filter: saturate(140%) blur(16px);
 }
 
 :global(.VPDoc) > .UnifiedLocalNav { margin-top: 0; }
@@ -271,8 +271,10 @@ watch(
   overflow: hidden;
   border: 1px solid var(--outline);
   border-radius: var(--radius-l);
-  background: var(--surface-bright);
+  background: color-mix(in srgb, var(--surface-bright) 88%, transparent);
   box-shadow: var(--shadow-pop);
+  backdrop-filter: saturate(140%) blur(18px);
+  -webkit-backdrop-filter: saturate(140%) blur(18px);
   overscroll-behavior: contain;
   touch-action: pan-y;
 }

@@ -37,7 +37,7 @@ export default defineConfig({
     [
       'script',
       {},
-      "try{var d=matchMedia('(prefers-color-scheme: dark)').matches;document.documentElement.classList.toggle('dark',d);document.documentElement.toggleAttribute('data-theme',d)}catch(e){}",
+      "try{var d=matchMedia('(prefers-color-scheme: dark)').matches;document.documentElement.classList.toggle('dark',d);d?document.documentElement.setAttribute('data-theme','dark'):document.documentElement.removeAttribute('data-theme')}catch(e){}",
     ],
     ['link', { rel: 'preconnect', href: 'https://fonts.googleapis.com' }],
     ['link', { rel: 'preconnect', href: 'https://fonts.gstatic.com', crossorigin: '' }],

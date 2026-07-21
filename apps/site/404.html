@@ -2,7 +2,7 @@
 <html lang="zh-CN">
 <head>
   <meta charset="utf-8" />
-  <script>try{var d=matchMedia('(prefers-color-scheme: dark)').matches;document.documentElement.classList.toggle('dark',d);document.documentElement.toggleAttribute('data-theme',d)}catch(e){}</script>
+  <script>try{var d=matchMedia('(prefers-color-scheme: dark)').matches;document.documentElement.classList.toggle('dark',d);d?document.documentElement.setAttribute('data-theme','dark'):document.documentElement.removeAttribute('data-theme')}catch(e){}</script>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>页面不存在 · Archive at Home</title>
   <meta name="robots" content="noindex" />

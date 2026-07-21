@@ -2,7 +2,7 @@
 <html lang="zh-CN">
 <head>
   <meta charset="utf-8" />
-  <script>try{var d=matchMedia('(prefers-color-scheme: dark)').matches;document.documentElement.classList.toggle('dark',d);document.documentElement.toggleAttribute('data-theme',d)}catch(e){}</script>
+  <script>try{var d=matchMedia('(prefers-color-scheme: dark)').matches;document.documentElement.classList.toggle('dark',d);d?document.documentElement.setAttribute('data-theme','dark'):document.documentElement.removeAttribute('data-theme')}catch(e){}</script>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Archive at Home · 提交解析任务，由志愿者节点用自己的账号配额完成解析</title>
   <meta name="description" content="Archive at Home 是一个分布式的 E-Hentai 归档链接公益解析网络：用户提交解析任务，由志愿者部署的节点用自己的账号配额完成解析。" />

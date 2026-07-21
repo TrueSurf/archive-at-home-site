@@ -5,5 +5,11 @@ const { page, theme } = useData()
 </script>
 
 <template>
-  <site-navbar v-if="!page.isNotFound" docs-mode :site-base="theme.siteBase || '/'" :docs-base="theme.docsBase" />
+  <site-navbar
+    v-if="!page.isNotFound"
+    :key="page.relativePath"
+    docs-mode
+    :site-base="theme.siteBase || '/'"
+    :docs-base="theme.docsBase"
+  />
 </template>

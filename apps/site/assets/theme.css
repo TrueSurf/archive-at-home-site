@@ -18,11 +18,11 @@
   /* 辅助暖橙（ eyebrow / 标记点，极少量使用） */
   --accent-warm: #c96f4a;
 
-  /* 表面·暖纸色分层 */
-  --surface: #faf9f5;
+  /* 表面·超浅青绿分层 */
+  --surface: #f5faf8;
   --surface-bright: #ffffff;
-  --surface-container: #f1efe8;
-  --surface-sunken: #ece9e0;
+  --surface-container: #eaf3f0;
+  --surface-sunken: #e2eeea;
 
   /* 文字·暖黑 */
   --on-surface: #1f1e1a;
@@ -30,8 +30,8 @@
   --on-surface-dim: #8b897e;
 
   /* 描边 */
-  --outline: #ddd9cc;
-  --outline-variant: #e8e5da;
+  --outline: #d4e2de;
+  --outline-variant: #e1ebe8;
 
   /* 功能色 */
   --success: #2e8b57;
@@ -45,8 +45,8 @@
   --on-warning-container: #6b4a0e;
 
   /* 代码块·浅色（纸色底 + 深字） */
-  --code-bg: #f4f2ec;
-  --code-border: #e4e1d5;
+  --code-bg: #eef5f2;
+  --code-border: #dbe8e4;
   --code-text: #2b2a25;
 
   --font-serif: 'Noto Serif SC', 'Songti SC', 'STSong', Georgia, serif;
@@ -179,10 +179,10 @@ code, kbd, pre {
   right: 0;
   z-index: 20;
   height: var(--header-h);
-  background: color-mix(in srgb, var(--surface) 94%, transparent);
+  background: color-mix(in srgb, var(--surface) 84%, transparent);
   border-bottom: 1px solid var(--outline-variant);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
+  backdrop-filter: saturate(140%) blur(16px);
+  -webkit-backdrop-filter: saturate(140%) blur(16px);
   transition: background 0.2s ease, border-color 0.2s ease;
 }
 
@@ -315,12 +315,23 @@ html[data-theme="dark"] .site-nav > a.nav-home-link:hover {
 
 .nav-toggle {
   display: none;
-  padding: 8px;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  padding: 0;
   border: 1px solid var(--outline);
   border-radius: var(--radius-m);
   background: var(--surface-bright);
   color: var(--on-surface);
   cursor: pointer;
+}
+
+.nav-toggle svg {
+  display: block;
+  width: 20px;
+  height: 20px;
+  flex: none;
 }
 
 @media (max-width: 860px) {
@@ -338,8 +349,10 @@ html[data-theme="dark"] .site-nav > a.nav-home-link:hover {
     padding: 10px var(--page-inline) 14px;
     opacity: 1;
     transform: none;
-    background: var(--surface);
+    background: color-mix(in srgb, var(--surface) 88%, transparent);
     border-bottom: 1px solid var(--outline-variant);
+    backdrop-filter: saturate(140%) blur(16px);
+    -webkit-backdrop-filter: saturate(140%) blur(16px);
   }
   .site-nav.open { display: flex; }
   .site-nav > a:not(.nav-icon-link) { padding: 8px 12px; line-height: 1.2; }
