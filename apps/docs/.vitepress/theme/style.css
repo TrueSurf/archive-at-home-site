@@ -38,6 +38,9 @@
   --vp-code-bg: var(--code-bg);
   --vp-code-color: var(--on-brand-container);
   --vp-code-block-bg: var(--code-bg);
+  --vp-code-block-color: var(--code-text);
+  --vp-code-lang-color: var(--on-surface-dim);
+  --vp-code-line-number-color: var(--on-surface-dim);
   --vp-code-line-highlight-color: var(--brand-soft);
 
   --vp-button-brand-border: var(--brand);
@@ -266,7 +269,7 @@ body {
   margin-right: 0 !important;
 }
 
-/* 顺序：首页 → 菜单(…API) → 返回主站 → TG → mailto/GH/主题 */
+/* 顺序：首页 → 菜单(…API) → 返回主站 → 四图标工具组 → Extra/Hamburger */
 .VPNavBar .content-body > .nav-text-link { order: 1; }
 .VPNavBar .content-body > .VPNavBarMenu,
 .VPNavBar .content-body > .menu { order: 2; }
@@ -322,34 +325,7 @@ body {
   background: var(--brand-container) !important;
 }
 
-/* 社交图标：与主站 nav-icon-link 同尺寸 */
-.VPSocialLinks {
-  display: flex;
-  align-items: center;
-  gap: 2px;
-  margin-left: 8px !important;
-  margin-right: 0 !important;
-  padding-left: 10px;
-  border-left: 1px solid var(--outline-variant);
-}
-
-.VPSocialLink {
-  width: 36px !important;
-  height: 36px !important;
-  border-radius: var(--radius-m);
-  color: var(--on-surface-variant) !important;
-}
-
-.VPSocialLink:hover {
-  color: var(--on-surface) !important;
-  background: var(--surface-container) !important;
-}
-
-.VPSocialLink .vpi-social-telegram,
-.VPSocialLink .vpi-social-github {
-  color: inherit;
-}
-
+/* VP 默认 socialLinks 已停用，图标改由 .nav-end-tools 统一渲染 */
 .VPNavBar .menu + .social-links::before,
 .VPNavBar .appearance + .social-links::before {
   display: none !important;
@@ -483,6 +459,53 @@ body {
   border: 1px solid var(--code-border);
   border-radius: var(--radius-m);
   background: var(--code-bg);
+}
+
+/* 代码块正文色 */
+.vp-doc div[class*='language-'] code,
+.vp-doc div[class*='language-'] pre {
+  color: var(--code-text);
+  background: transparent;
+}
+
+/*
+ * VitePress Shiki 双主题默认挂在 html.dark / html:not(.dark) 上，
+ * 本站自定义 data-theme，需单独把深色高亮切到 --shiki-dark。
+ */
+html[data-theme='dark'] .shiki,
+html[data-theme='dark'] .shiki span {
+  color: var(--shiki-dark, var(--code-text)) !important;
+  -webkit-text-decoration: var(--shiki-dark-text-decoration, inherit);
+  text-decoration: var(--shiki-dark-text-decoration, inherit);
+  font-weight: var(--shiki-dark-font-weight, inherit);
+  background-color: transparent !important;
+}
+
+html:not([data-theme='dark']) .shiki,
+html:not([data-theme='dark']) .shiki span {
+  color: var(--shiki-light, var(--code-text));
+  -webkit-text-decoration: var(--shiki-light-text-decoration, inherit);
+  text-decoration: var(--shiki-light-text-decoration, inherit);
+  font-weight: var(--shiki-light-font-weight, inherit);
+  background-color: transparent;
+}
+
+/* 深色代码块：独立视觉，避免浅色 token 贴深底 */
+html[data-theme='dark'] .vp-doc div[class*='language-'] {
+  background: var(--code-bg);
+  border-color: var(--code-border);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.03);
+}
+
+html[data-theme='dark'] .vp-doc div[class*='language-'] .lang,
+html[data-theme='dark'] .vp-doc div[class*='language-'] button.copy {
+  color: var(--on-surface-dim);
+}
+
+html[data-theme='dark'] .vp-doc :not(pre) > code {
+  color: var(--on-brand-container);
+  background: var(--code-bg);
+  border-color: var(--code-border);
 }
 
 .vp-doc blockquote {
@@ -732,42 +755,79 @@ body {
   display: none !important;
 }
 
-/* nav-end-tools: mailto / github / theme，接在 TG 社交组后 */
+/* ---------- NavBar 四图标统一（TG / Mail / GH / Theme） ---------- */
+
+.VPSocialLinks {
+  display: none !important; /* 改由自定义 Telegram 图标接管，避免图标字体与 SVG 混用 */
+}
+
 .nav-end-tools {
   display: inline-flex;
   align-items: center;
   gap: 2px;
+  margin-left: 8px;
+  padding-left: 10px;
+  border-left: 1px solid var(--outline-variant);
 }
 
 .nav-end-tools .nav-icon-link,
 .nav-end-tools .MailLink,
-.nav-end-tools .GitHubLink {
+.nav-end-tools .GitHubLink,
+.nav-end-tools .TelegramLink,
+.nav-end-tools .theme-toggle {
   display: inline-flex;
   align-items: center;
   justify-content: center;
   width: 36px;
   height: 36px;
+  padding: 0;
+  border: 0;
   border-radius: var(--radius-m);
+  background: transparent;
   color: var(--on-surface-variant);
   text-decoration: none;
+  cursor: pointer;
+  transition: color 0.15s ease, background 0.15s ease;
 }
 
 .nav-end-tools .nav-icon-link:hover,
 .nav-end-tools .MailLink:hover,
-.nav-end-tools .GitHubLink:hover {
+.nav-end-tools .GitHubLink:hover,
+.nav-end-tools .TelegramLink:hover,
+.nav-end-tools .theme-toggle:hover {
   color: var(--on-surface);
   background: var(--surface-container);
   text-decoration: none;
 }
 
-.nav-end-tools .theme-toggle {
-  margin-left: 2px;
+.nav-end-tools .nav-icon-link svg,
+.nav-end-tools .MailLink svg,
+.nav-end-tools .GitHubLink svg,
+.nav-end-tools .TelegramLink svg,
+.nav-end-tools .theme-toggle svg {
+  display: block;
+  width: 20px;
+  height: 20px;
+  flex: none;
 }
 
-/* 移动端抽屉 */
-.VPNavScreen .nav-end-tools {
-  padding: 12px 0;
-  gap: 8px;
+.nav-end-tools .theme-toggle {
+  margin-left: 0;
+}
+
+@media (max-width: 640px) {
+  .nav-end-tools {
+    margin-left: 0;
+    padding-left: 0;
+    border-left: 0;
+  }
+
+  .VPNavScreen .nav-end-tools {
+    margin-left: 0;
+    padding: 12px 0;
+    border-left: 0;
+    gap: 8px;
+  }
 }
 
 

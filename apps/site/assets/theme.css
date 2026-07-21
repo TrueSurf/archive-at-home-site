@@ -44,7 +44,7 @@
   --warning-container: #f7ecd4;
   --on-warning-container: #6b4a0e;
 
-  /* 代码（Claude 风格浅色代码块） */
+  /* 代码块·浅色（纸色底 + 深字） */
   --code-bg: #f4f2ec;
   --code-border: #e4e1d5;
   --code-text: #2b2a25;
@@ -102,9 +102,10 @@ html[data-theme="dark"] {
   --warning-container: #3a2e14;
   --on-warning-container: #f0d9a0;
 
-  --code-bg: #1a1c18;
-  --code-border: #34362f;
-  --code-text: #e6e4da;
+  /* 代码块·深色独立风格（抬亮底 + 高对比正文，配合 github-dark 高亮） */
+  --code-bg: #1c2128;
+  --code-border: #3d444d;
+  --code-text: #e6edf3;
 
   --shadow-card: 0 1px 2px rgba(0, 0, 0, 0.25), 0 4px 16px rgba(0, 0, 0, 0.28);
   --shadow-pop: 0 2px 8px rgba(0, 0, 0, 0.28), 0 16px 40px rgba(0, 0, 0, 0.36);
@@ -230,7 +231,7 @@ code, kbd, pre {
   pointer-events: auto;
   display: flex;
   align-items: center;
-  gap: 4px;
+  gap: 2px;
   margin-left: auto;
 }
 
@@ -306,7 +307,7 @@ code, kbd, pre {
   text-decoration: none;
 }
 .site-nav .nav-icon-link svg,
-.nav-icon-link svg { display: block; width: 20px; height: 20px; }
+.nav-icon-link svg { display: block; width: 20px; height: 20px; flex: none; }
 
 /* 主题切换按钮 */
 .theme-toggle {
@@ -327,7 +328,7 @@ code, kbd, pre {
   color: var(--on-surface);
   background: var(--surface-container);
 }
-.theme-toggle svg { display: block; width: 18px; height: 18px; }
+.theme-toggle svg { display: block; width: 20px; height: 20px; flex: none; }
 .theme-toggle .icon-sun { display: none; }
 .theme-toggle .icon-moon { display: block; }
 html[data-theme="dark"] .theme-toggle .icon-sun { display: block; }

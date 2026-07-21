@@ -13,6 +13,12 @@ export default defineConfig({
   base: docsBase,
   cleanUrls: true,
   appearance: false,
+  markdown: {
+    theme: {
+      light: 'github-light',
+      dark: 'github-dark',
+    },
+  },
   server: {
     host: '127.0.0.1',
     port: 5173,
@@ -21,7 +27,7 @@ export default defineConfig({
     [
       'script',
       {},
-      "try{var k='aah-theme';var s=localStorage.getItem(k);var d=s==='dark'||(!s&&matchMedia('(prefers-color-scheme: dark)').matches);if(d)document.documentElement.setAttribute('data-theme','dark')}catch(e){}",
+      "try{var k='aah-theme';var s=localStorage.getItem(k);var d=s==='dark'||(!s&&matchMedia('(prefers-color-scheme: dark)').matches);if(d){document.documentElement.setAttribute('data-theme','dark');document.documentElement.classList.add('dark')}}catch(e){}",
     ],
     ['link', { rel: 'preconnect', href: 'https://fonts.googleapis.com' }],
     ['link', { rel: 'preconnect', href: 'https://fonts.gstatic.com', crossorigin: '' }],
@@ -62,10 +68,6 @@ export default defineConfig({
           { text: 'Server API', link: '/api/server' },
         ],
       },
-    ],
-
-    socialLinks: [
-      { icon: 'telegram', link: 'https://t.me/ArchiveAtHome' },
     ],
   },
 })

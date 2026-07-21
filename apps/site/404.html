@@ -8,7 +8,7 @@
         var key = 'aah-theme';
         var saved = localStorage.getItem(key);
         var dark = saved === 'dark' || (!saved && window.matchMedia('(prefers-color-scheme: dark)').matches);
-        if (dark) document.documentElement.setAttribute('data-theme', 'dark');
+        if (dark) { document.documentElement.setAttribute('data-theme', 'dark'); document.documentElement.classList.add('dark'); }
       } catch (e) {}
     })();
   </script>

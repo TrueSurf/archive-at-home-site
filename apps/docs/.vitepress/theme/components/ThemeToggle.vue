@@ -19,8 +19,14 @@ function readTheme(): 'dark' | 'light' {
 
 function apply(mode: 'dark' | 'light') {
   isDark.value = mode === 'dark'
-  if (mode === 'dark') document.documentElement.setAttribute('data-theme', 'dark')
-  else document.documentElement.removeAttribute('data-theme')
+  const root = document.documentElement
+  if (mode === 'dark') {
+    root.setAttribute('data-theme', 'dark')
+    root.classList.add('dark')
+  } else {
+    root.removeAttribute('data-theme')
+    root.classList.remove('dark')
+  }
 }
 
 function toggle() {
