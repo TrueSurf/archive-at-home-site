@@ -4,7 +4,7 @@
  * 使 apps/site 成为一个完整的静态部署根目录。
  * 文档内 404 统一替换为主站 404.html，全站共用同一页面。
  */
-import { cpSync, existsSync, rmSync, copyFileSync } from 'node:fs'
+import { cpSync, existsSync, rmSync, readFileSync, writeFileSync } from 'node:fs'
 import { join } from 'node:path'
 import { fileURLToPath } from 'node:url'
 
@@ -23,11 +23,22 @@ rmSync(target, { recursive: true, force: true })
 cpSync(docsDist, target, { recursive: true })
 
 // 全站共用主站 404（覆盖 VitePress 自带 404）
+// docs/ 子路径下把相对 assets 改成 ../assets
 if (!existsSync(site404)) {
   console.error('未找到主站 404.html')
   process.exit(1)
 }
-copyFileSync(site404, docs404)
+{
+  let html = readFileSync(site404, 'utf8')
+  html = html
+    .replaceAll('href="assets/', 'href="../assets/')
+    .replaceAll("href='assets/", "href='../assets/")
+    .replaceAll('href="/assets/', 'href="../assets/')
+    .replaceAll('src="assets/', 'src="../assets/')
+    .replaceAll("src='assets/", "src='../assets/")
+    .replaceAll('src="/assets/', 'src="../assets/')
+  writeFileSync(docs404, html)
+}
 
 console.log(`已组装: ${target}`)
 console.log(`已统一 404: ${docs404}`)
