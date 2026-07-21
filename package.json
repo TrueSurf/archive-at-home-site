@@ -7,7 +7,8 @@
     "apps/docs"
   ],
   "scripts": {
-    "dev": "node scripts/serve-site.mjs",
+    "dev": "npm run build && node scripts/serve-site.mjs",
+    "dev:serve": "node scripts/serve-site.mjs",
     "docs:dev": "npm run dev -w @archive-at-home/docs",
     "docs:build": "npm run build -w @archive-at-home/docs",
     "docs:preview": "npm run preview -w @archive-at-home/docs",

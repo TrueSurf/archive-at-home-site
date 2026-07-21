@@ -16,19 +16,29 @@ const menuIcon = `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" st
 
 function normalizeBase(value, fallback) {
   const base = value || fallback
-  return `${base.startsWith('/') ? base : `/${base}`.replace(/\/+/g, '/')}${base.endsWith('/') ? '' : '/'}`
+  let s = String(base).trim().replace(/\\/g, '/')
+  if (!s.startsWith('/')) s = `/${s}`
+  // keep root as "/"
+  if (s !== '/') s = s.replace(/\/+$/, '')
+  return s === '/' ? '/' : `${s}/`
 }
 
 /**
  * Infer site root prefix from this module URL.
  * - Root deploy: /assets/site-shell.js -> ''
  * - Project Pages: /archive-at-home-site/assets/site-shell.js -> '/archive-at-home-site'
+ * - Docs chunk: /docs/assets/chunks/site-shell.HASH.js -> ''
+ * - Pages docs chunk: /archive-at-home-site/docs/assets/chunks/site-shell.HASH.js -> '/archive-at-home-site'
  */
 function detectSiteBase() {
   try {
     if (typeof import.meta !== 'undefined' && import.meta.url) {
       const { pathname } = new URL(import.meta.url)
-      const match = pathname.match(/^(.*)\/assets\/site-shell\.js$/i)
+      // Main site copy: .../assets/site-shell.js
+      let match = pathname.match(/^(.*)\/assets\/site-shell(?:\.[^/]+)?\.js$/i)
+      if (match) return match[1]
+      // VitePress bundled chunk: .../docs/assets/chunks/site-shell*.js
+      match = pathname.match(/^(.*)\/docs\/assets\/(?:chunks\/)?site-shell[^/]*\.js$/i)
       if (match) return match[1]
     }
   } catch {
@@ -38,11 +48,18 @@ function detectSiteBase() {
 }
 
 function resolveSiteBase(attrValue) {
-  if (attrValue != null && attrValue !== '') {
+  if (attrValue != null && String(attrValue).trim() !== '') {
     return normalizeBase(attrValue, '/')
   }
   const detected = detectSiteBase()
   return normalizeBase(detected || '/', '/')
+}
+
+function resolveDocsBase(attrValue, siteBase) {
+  if (attrValue != null && String(attrValue).trim() !== '') {
+    return normalizeBase(attrValue, `${siteBase}docs/`)
+  }
+  return normalizeBase(`${siteBase}docs/`, '/docs/')
 }
 
 function iconLink(href, label, icon, external = false) {
@@ -71,26 +88,30 @@ class SiteNavbar extends HTMLElementBase {
     if (typeof window === 'undefined') return
     const docsMode = this.hasAttribute('docs-mode')
     const siteBase = resolveSiteBase(this.getAttribute('site-base'))
-    const docsBase = normalizeBase(this.getAttribute('docs-base'), `${siteBase}docs/`)
-    const homeHref = docsMode ? docsBase : siteBase
-    const path = window.location.pathname.replace(/\/+$/, '/')
+    const docsBase = resolveDocsBase(this.getAttribute('docs-base'), siteBase)
+    // 文档站内「首页」= 文档落地页；「回到主页」= 主站根路径
+    const docsHomeHref = docsBase
+    const mainHomeHref = siteBase
+    const path = window.location.pathname.replace(/\/+$/, '/') || '/'
     const navItems = [
-      ['首页', homeHref],
+      ['首页', docsMode ? docsHomeHref : mainHomeHref],
       ['使用指南', `${docsBase}use`],
       ['节点部署', `${docsBase}node`],
       ['API 文档', `${docsBase}api/server`],
     ]
     const links = navItems.map(([label, href], index) => {
       const active = index === 0
-        ? path === homeHref
+        ? path === href || path === href.replace(/\/+$/, '') + '/'
         : path === href || path === `${href}/` || path === `${href}.html`
       return `<a href="${href}"${active ? ' class="active" aria-current="page"' : ''}>${label}</a>`
     }).join('')
 
+    const logoHref = docsMode ? docsHomeHref : mainHomeHref
+
     this.innerHTML = `
       <header class="site-header">
         <div class="site-header-inner">
-          <a class="site-logo" href="${homeHref}">
+          <a class="site-logo" href="${logoHref}">
             ${brandMark}
             <span>Archive at Home</span>
             ${docsMode ? '<span class="site-logo-section">文档</span>' : ''}
@@ -99,7 +120,7 @@ class SiteNavbar extends HTMLElementBase {
             <button class="nav-toggle" type="button" aria-label="打开导航" aria-expanded="false">${menuIcon}</button>
             <nav class="site-nav" aria-label="主导航">
               ${links}
-              ${docsMode ? `<a class="nav-home-link" href="${siteBase}" target="_self">回到主页</a>` : ''}
+              ${docsMode ? `<a class="nav-home-link" href="${mainHomeHref}" data-main-home="${mainHomeHref}">回到主页</a>` : ''}
               <div class="nav-social">
                 ${iconLink(TELEGRAM_URL, 'Telegram 频道', telegramIcon, true)}
                 ${iconLink(`mailto:${SUPPORT_EMAIL}`, `发送邮件至 ${SUPPORT_EMAIL}`, mailIcon)}
@@ -117,6 +138,16 @@ class SiteNavbar extends HTMLElementBase {
       toggle.setAttribute('aria-expanded', String(open))
       toggle.setAttribute('aria-label', open ? '关闭导航' : '打开导航')
     })
+
+    // 强制整页跳回主站，避免 VitePress 客户端路由误拦截
+    const homeLink = this.querySelector('a.nav-home-link[data-main-home]')
+    if (homeLink) {
+      homeLink.addEventListener('click', (event) => {
+        event.preventDefault()
+        event.stopPropagation()
+        window.location.assign(homeLink.getAttribute('data-main-home') || mainHomeHref)
+      })
+    }
   }
 }
 
@@ -125,7 +156,7 @@ class SiteFooter extends HTMLElementBase {
     if (typeof window === 'undefined') return
     const docsMode = this.hasAttribute('docs-mode')
     const siteBase = resolveSiteBase(this.getAttribute('site-base'))
-    const docsBase = normalizeBase(this.getAttribute('docs-base'), `${siteBase}docs/`)
+    const docsBase = resolveDocsBase(this.getAttribute('docs-base'), siteBase)
     this.innerHTML = `
       <footer class="site-footer">
         <div class="container">

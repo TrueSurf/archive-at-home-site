@@ -73,6 +73,18 @@ cpSync(docsDist, target, { recursive: true })
  * VitePress 2 alpha 生成 rel="preload stylesheet" ... as="style"
  * 部分浏览器/预览环境只 preload 不应用样式。改为标准 stylesheet。
  */
+/**
+ * lightningcss 有时只保留 -webkit-backdrop-filter。
+ * 补回标准属性，保证 Chromium / Firefox / Safari 都能毛玻璃。
+ */
+function ensureBackdropFilter(css) {
+  // 仅在 -webkit- 后缺少标准属性时补全
+  return css.replace(
+    /-webkit-backdrop-filter:([^;{}]+);(?!backdrop-filter:)/g,
+    '-webkit-backdrop-filter:$1;backdrop-filter:$1;',
+  )
+}
+
 function fixStylesheetLinks(html) {
   return html.replace(
     /<link\s+rel="preload stylesheet"\s+href="([^"]+)"\s+as="style"\s*\/?>/g,
@@ -126,6 +138,23 @@ function fixAllHtml(dir) {
 
 fixAllHtml(target)
 promoteCleanUrlDirs(target)
+
+// 修正 docs 构建 CSS 中可能丢失的 unprefixed backdrop-filter
+{
+  const assetsDir = join(target, 'assets')
+  if (existsSync(assetsDir)) {
+    for (const name of readdirSync(assetsDir)) {
+      if (!name.endsWith('.css')) continue
+      const full = join(assetsDir, name)
+      const raw = readFileSync(full, 'utf8')
+      const next = ensureBackdropFilter(raw)
+      if (next !== raw) {
+        writeFileSync(full, next)
+        console.log('已补全 backdrop-filter: ' + name)
+      }
+    }
+  }
+}
 
 writeFileSync(join(siteRoot, '.nojekyll'), '')
 

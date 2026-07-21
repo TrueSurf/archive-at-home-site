@@ -4,6 +4,8 @@ import { useData } from 'vitepress'
 
 const { frontmatter, page, theme } = useData()
 const isHome = computed(() => frontmatter.value.layout === 'home')
+const siteBase = (theme.value.mainHome || theme.value.siteBase || '/') as string
+const docsBase = (theme.value.docsBase || '/docs/') as string
 </script>
 
 <template>
@@ -11,7 +13,7 @@ const isHome = computed(() => frontmatter.value.layout === 'home')
     v-if="!page.isNotFound"
     docs-mode
     :class="{ 'docs-page-footer': !isHome }"
-    :site-base="theme.siteBase || '/'"
-    :docs-base="theme.docsBase"
+    :site-base="siteBase"
+    :docs-base="docsBase"
   />
 </template>

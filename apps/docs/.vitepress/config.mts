@@ -23,6 +23,12 @@ export default defineConfig({
       },
     },
   },
+  // 保留 unprefixed backdrop-filter（避免 lightningcss 只剩 -webkit-）
+  vite: {
+    build: {
+      cssTarget: ['chrome99', 'firefox88', 'safari15', 'edge99'],
+    },
+  },
   markdown: {
     theme: {
       light: 'github-light',

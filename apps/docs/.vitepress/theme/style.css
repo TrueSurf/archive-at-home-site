@@ -115,8 +115,13 @@ body {
 
 /* ---------- 共享站点顶栏 / 根布局 ---------- */
 
+/* site-navbar 宿主不要建 stacking context：内部 .site-header 是 fixed，
+   父级 relative+z-index 会把 backdrop-filter 的采样范围截断为空。 */
 .Layout > site-navbar {
-  position: relative;
+  display: block;
+}
+
+.Layout .site-header {
   z-index: 100001;
 }
 

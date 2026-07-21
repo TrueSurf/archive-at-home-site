@@ -104,7 +104,15 @@ function activatePageLink(item: NavLink) {
 
 function siteHref(link: string) {
   if (link === '__main__') {
-    return (import.meta.env.BASE_URL || '/docs/').replace(/docs\/?$/, '') || '/'
+    const mainHome = (theme.value as { mainHome?: string; siteBase?: string }).mainHome
+      || (theme.value as { siteBase?: string }).siteBase
+    if (typeof mainHome === 'string' && mainHome.length > 0) {
+      return mainHome.endsWith('/') ? mainHome : `${mainHome}/`
+    }
+    // BASE_URL = /docs/ 或 /archive-at-home-site/docs/ → 主站根
+    const base = import.meta.env.BASE_URL || '/docs/'
+    const stripped = base.replace(/\/docs\/?$/, '/')
+    return stripped || '/'
   }
   if (link.startsWith('http')) return link
   return withBase(link)
@@ -394,9 +402,9 @@ watch(
     margin: 0;
     border-right: 1px solid var(--outline-variant);
     border-bottom: 0;
-    background: var(--surface);
-    backdrop-filter: none;
-    -webkit-backdrop-filter: none;
+    background: color-mix(in srgb, var(--surface) 84%, transparent);
+    backdrop-filter: saturate(140%) blur(16px);
+    -webkit-backdrop-filter: saturate(140%) blur(16px);
   }
 
   .container {
