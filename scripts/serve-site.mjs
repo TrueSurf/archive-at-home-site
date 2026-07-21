@@ -1,18 +1,20 @@
 /**
  * 主站静态文件服务器（零依赖，仅本地开发用）。
- * - 服务 apps/site 下的静态文件
+ * - 始终按「根路径」服务 apps/site（与 npm run build 一致，与 build:gh 的子路径分离）
  * - 目录自动补 index.html，扩展名可省略（clean URL）
  * - 未命中时统一返回站点根目录 404.html（状态码 404）
+ * - 404 优先从 404.template.html 按根路径渲染，避免上次 build:gh 残留子路径
  * - 默认端口 4321；被占用时自动尝试后续端口
  */
 import { createServer } from 'node:http'
-import { createReadStream, existsSync, statSync } from 'node:fs'
+import { createReadStream, existsSync, readFileSync, statSync } from 'node:fs'
 import { extname, join, normalize } from 'node:path'
 import { fileURLToPath } from 'node:url'
 
 const root = fileURLToPath(new URL('../apps/site', import.meta.url))
 const preferredPort = Number(process.env.PORT ?? 4321)
 const notFoundPage = join(root, '404.html')
+const notFoundTemplate = join(root, '404.template.html')
 
 const mime = {
   '.html': 'text/html; charset=utf-8',
@@ -29,6 +31,18 @@ const mime = {
   '.webm': 'video/webm',
   '.ico': 'image/x-icon',
   '.woff2': 'font/woff2',
+}
+
+function renderRootNotFound() {
+  if (existsSync(notFoundTemplate)) {
+    return readFileSync(notFoundTemplate, 'utf8')
+      .replaceAll('__SITE_HOME__', '/')
+      .replaceAll('__SITE_ASSETS__', '/assets')
+  }
+  if (existsSync(notFoundPage)) {
+    return readFileSync(notFoundPage, 'utf8')
+  }
+  return '<!doctype html><title>404</title><h1>Not Found</h1>'
 }
 
 function resolveFile(urlPath) {
@@ -49,6 +63,7 @@ function resolveFile(urlPath) {
   if (existsSync(file) && statSync(file).isFile()) {
     const rel = file.slice(root.length).replace(/\\/g, '/')
     if (rel === '/docs/404.html' || rel === 'docs/404.html') return null
+    if (rel === '/404.html' || rel === '404.html') return null // 走模板渲染
     return file
   }
   return null
@@ -58,12 +73,16 @@ function createAppServer() {
   return createServer((req, res) => {
     const urlPath = new URL(req.url ?? '/', 'http://localhost').pathname
     const file = resolveFile(urlPath)
-    const target = file ?? notFoundPage
-    const status = file ? 200 : 404
-    res.writeHead(status, {
-      'Content-Type': mime[extname(target)] ?? 'application/octet-stream',
+    if (!file) {
+      const html = renderRootNotFound()
+      res.writeHead(404, { 'Content-Type': 'text/html; charset=utf-8' })
+      res.end(html)
+      return
+    }
+    res.writeHead(200, {
+      'Content-Type': mime[extname(file)] ?? 'application/octet-stream',
     })
-    createReadStream(target).pipe(res)
+    createReadStream(file).pipe(res)
   })
 }
 
@@ -88,6 +107,7 @@ function listen(port, attemptsLeft) {
   })
   server.listen(port, '127.0.0.1', () => {
     console.log(`主站开发服务器: http://127.0.0.1:${port}`)
+    console.log('（本地始终按根路径服务，与 npm run build 一致；GitHub Pages 请用 npm run build:gh）')
   })
 }
 

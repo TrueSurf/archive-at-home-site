@@ -19,6 +19,32 @@ function normalizeBase(value, fallback) {
   return `${base.startsWith('/') ? base : `/${base}`.replace(/\/+/g, '/')}${base.endsWith('/') ? '' : '/'}`
 }
 
+/**
+ * Infer site root prefix from this module URL.
+ * - Root deploy: /assets/site-shell.js -> ''
+ * - Project Pages: /archive-at-home-site/assets/site-shell.js -> '/archive-at-home-site'
+ */
+function detectSiteBase() {
+  try {
+    if (typeof import.meta !== 'undefined' && import.meta.url) {
+      const { pathname } = new URL(import.meta.url)
+      const match = pathname.match(/^(.*)\/assets\/site-shell\.js$/i)
+      if (match) return match[1]
+    }
+  } catch {
+    /* ignore */
+  }
+  return ''
+}
+
+function resolveSiteBase(attrValue) {
+  if (attrValue != null && attrValue !== '') {
+    return normalizeBase(attrValue, '/')
+  }
+  const detected = detectSiteBase()
+  return normalizeBase(detected || '/', '/')
+}
+
 function iconLink(href, label, icon, external = false) {
   return `<a class="nav-icon-link" href="${href}" title="${label}" aria-label="${label}"${external ? ' target="_blank" rel="noopener"' : ''}>${icon}</a>`
 }
@@ -33,10 +59,14 @@ function syncDeviceTheme() {
   media.addEventListener('change', apply)
 }
 
-class SiteNavbar extends HTMLElement {
+// SSR / Node build has no DOM; empty base class avoids "HTMLElement is not defined"
+const HTMLElementBase = typeof HTMLElement !== 'undefined' ? HTMLElement : class {}
+
+class SiteNavbar extends HTMLElementBase {
   connectedCallback() {
+    if (typeof window === 'undefined') return
     const docsMode = this.hasAttribute('docs-mode')
-    const siteBase = normalizeBase(this.getAttribute('site-base'), '/')
+    const siteBase = resolveSiteBase(this.getAttribute('site-base'))
     const docsBase = normalizeBase(this.getAttribute('docs-base'), `${siteBase}docs/`)
     const homeHref = docsMode ? docsBase : siteBase
     const path = window.location.pathname.replace(/\/+$/, '/')
@@ -86,10 +116,11 @@ class SiteNavbar extends HTMLElement {
   }
 }
 
-class SiteFooter extends HTMLElement {
+class SiteFooter extends HTMLElementBase {
   connectedCallback() {
+    if (typeof window === 'undefined') return
     const docsMode = this.hasAttribute('docs-mode')
-    const siteBase = normalizeBase(this.getAttribute('site-base'), '/')
+    const siteBase = resolveSiteBase(this.getAttribute('site-base'))
     const docsBase = normalizeBase(this.getAttribute('docs-base'), `${siteBase}docs/`)
     this.innerHTML = `
       <footer class="site-footer">

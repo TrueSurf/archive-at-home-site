@@ -6,8 +6,13 @@ import NotFound from './components/NotFound.vue'
 import SiteFooter from './components/SiteFooter.vue'
 import SiteNavbar from './components/SiteNavbar.vue'
 import UnifiedLocalNav from './components/UnifiedLocalNav.vue'
-import '../../../site/assets/site-shell.js'
 import './style.css'
+
+// Custom elements (site-navbar / site-footer) only load in the browser.
+// Top-level import would evaluate HTMLElement during VitePress SSR and break the build.
+if (!import.meta.env.SSR) {
+  void import('../../../site/assets/site-shell.js')
+}
 
 const theme: Theme = {
   ...DefaultTheme,

@@ -5,6 +5,13 @@
  * 文档内 404 统一替换为主站 404.html，全站共用同一页面。
  * 为 GitHub Pages 生成 clean URL 目录（foo.html -> foo/index.html）。
  * 修正 VitePress alpha 的 preload stylesheet，确保 CSS 一定被应用。
+ *
+ * SITE_BASE 控制路径前缀：
+ *   空 / 未设置 → 根路径部署（npm run build）
+ *   /archive-at-home-site → Project Pages（npm run build:gh）
+ *
+ * 主站 index.html 不改写：site-shell.js 通过 import.meta.url 自动推断 base。
+ * VitePress 文档 base 在构建期由 SITE_BASE 决定。
  */
 import {
   cpSync,
@@ -24,6 +31,7 @@ const siteRoot = fileURLToPath(new URL('../apps/site', import.meta.url))
 const docsDist = fileURLToPath(new URL('../apps/docs/.vitepress/dist', import.meta.url))
 const target = join(siteRoot, 'docs')
 const site404 = join(siteRoot, '404.html')
+const site404Template = join(siteRoot, '404.template.html')
 const docs404 = join(target, '404.html')
 const siteBase = getSiteBase()
 
@@ -31,6 +39,19 @@ function renderNotFound(html) {
   return html
     .replaceAll('__SITE_HOME__', getMainHome())
     .replaceAll('__SITE_ASSETS__', `${siteBase}/assets`)
+}
+
+function read404Template() {
+  if (existsSync(site404Template)) {
+    return readFileSync(site404Template, 'utf8')
+  }
+  // Backward compat: 404.html may still hold placeholders
+  if (existsSync(site404)) {
+    const raw = readFileSync(site404, 'utf8')
+    if (raw.includes('__SITE_HOME__')) return raw
+  }
+  console.error('未找到 404 模板（apps/site/404.template.html）')
+  process.exit(1)
 }
 
 if (!existsSync(docsDist)) {
@@ -41,14 +62,9 @@ if (!existsSync(docsDist)) {
 rmSync(target, { recursive: true, force: true })
 cpSync(docsDist, target, { recursive: true })
 
-// 全站共用主站 404（覆盖 VitePress 自带 404）
-if (!existsSync(site404)) {
-  console.error('未找到主站 404.html')
-  process.exit(1)
-}
+// 从模板生成 404（不永久改坏源模板）
 {
-  const source = readFileSync(site404, 'utf8')
-  const html = renderNotFound(source)
+  const html = renderNotFound(read404Template())
   writeFileSync(site404, html)
   writeFileSync(docs404, html)
 }
@@ -114,7 +130,7 @@ promoteCleanUrlDirs(target)
 writeFileSync(join(siteRoot, '.nojekyll'), '')
 
 console.log('已组装: ' + target)
+console.log(`SITE_BASE=${siteBase || '(root)'}  mainHome=${getMainHome()}`)
 console.log('已统一 404: ' + docs404)
 console.log('已修正 stylesheet 引用 / 生成 clean URL 目录')
 console.log('已写入 apps/site/.nojekyll')
-

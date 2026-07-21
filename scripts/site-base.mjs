@@ -1,7 +1,16 @@
 /**
  * 站点公共路径前缀。
- * - 本地 / 自定义域名根路径：SITE_BASE 为空 → docs base = /docs/
- * - GitHub Project Pages：SITE_BASE=/archive-at-home-site → docs base = /archive-at-home-site/docs/
+ *
+ * 本地开发 / 自定义域名根路径：
+ *   SITE_BASE 未设置或为空 → docs base = /docs/
+ *
+ * GitHub Project Pages：
+ *   SITE_BASE=/archive-at-home-site → docs base = /archive-at-home-site/docs/
+ *
+ * 使用：
+ *   npm run build      → 根路径（SITE_BASE 强制清空）
+ *   npm run build:gh   → Project Pages 前缀
+ *   npm run docs:dev   → 本地 /docs/（不设 SITE_BASE）
  */
 export function normalizeSiteBase(raw) {
   if (raw == null || raw === '' || raw === '/') return ''
